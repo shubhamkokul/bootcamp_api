@@ -8,6 +8,8 @@ const {
   getBootcampsInRadius,
   photoUploadBootCamp
 } = require("../controllers/bootcamps");
+const Bootcamp = require("../models/Bootcamp");
+const advanceResults = require("../middleware/advanceResult");
 
 //Include other resource routers
 const courseRouter = require("./courses");
@@ -23,7 +25,7 @@ router.route("/:id/photo").put(photoUploadBootCamp);
 
 router
   .route("/")
-  .get(getBootCamps)
+  .get(advanceResults(Bootcamp, 'courses'), getBootCamps)
   .post(createBootCamp);
 
 router
