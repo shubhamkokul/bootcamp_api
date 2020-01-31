@@ -7,6 +7,12 @@ const errorHandler = require("./middleware/error");
 const fileupload = require("express-fileupload");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xssClean = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
 
 //Load Env vars
 dotenv.config({ path: "./config/config.env" });
@@ -36,6 +42,28 @@ if (process.env.NODE_ENV === "development") {
 
 //File upload
 app.use(fileupload());
+
+// Sanitize Data
+app.use(mongoSanitize());
+
+// Prevent Cross-site-script
+app.use(xssClean());
+
+// Security Header
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100
+});
+app.use(limiter);
+
+// Prevent Http param pollution
+app.use(hpp());
+
+//Enable CORS
+app.use(cors());
 
 //Set static folder
 app.use(express.static(path.join(__dirname, "public")));
